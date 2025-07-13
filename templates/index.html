@@ -11,14 +11,16 @@
     <div class="main-content">
         <h1>AI-Driven Multi-Application Incident Assignment & Resolution</h1>
         <form id="search-form" autocomplete="off">
-            <label for="query">Query:</label>
-            <textarea id="query" name="query" required placeholder="Describe your ticket or issue..." rows="5" cols="80" style="resize:vertical;width:100%;min-width:300px;"></textarea>
+            <label for="query"><b>Query:</b></label>
+            <textarea id="query" name="query" required placeholder="Describe your ticket or issue..." rows="3" cols="60" style="resize:vertical;width:100%;min-width:300px;"></textarea>
             <div class="topn-group">
-                <label for="top_n">Top-N Results:</label>
+                <label for="top_n"><b>Top-N Results:</b></label>
                 <input type="number" id="top_n" name="top_n" min="1" max="10" value="3">
             </div>
-            <button type="submit" id="submit-btn">Search</button>
-            <button type="button" id="clear-btn">Clear</button>
+            <div class="form-buttons">
+                <button type="submit" id="submit-btn">Search</button>
+                <button type="button" id="clear-btn">Clear</button>
+            </div>
         </form>
         <div id="loading" class="loading" style="display:none;">Loading...</div>
         <div id="results" class="results"></div>

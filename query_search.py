@@ -199,7 +199,7 @@ def main():
             X_query = vectorizer.transform([query_text])
             pred = clf.predict(X_query)[0]
             proba = max(clf.predict_proba(X_query)[0])
-            print(f"\n{Fore.CYAN}Classifier prediction: {pred}{Style.RESET_ALL} (confidence: {proba:.2f})")
+            print(f"\n{Fore.CYAN}Classifier prediction (Random Forest): {pred}{Style.RESET_ALL} (confidence: {proba:.2f})")
 
         print(f"\nTop {top_n} most similar tickets:")
         app_tally = {}

@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingDiv = document.getElementById('loading');
     const clearBtn = document.getElementById('clear-btn');
     const consoleContent = document.getElementById('console-content');
+    const consoleBtn = document.querySelector('.collapsible-btn');
     let lastHealth = null;
+    let consoleVisible = false;
 
     async function checkHealth() {
         try {
@@ -43,15 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
         consoleContent.innerHTML += `<div>[${now}] ${msg}</div>`;
         consoleContent.scrollTop = consoleContent.scrollHeight;
     }
+    function updateConsoleButton() {
+        if (consoleBtn) consoleBtn.textContent = consoleVisible ? 'Hide Console' : 'Show Console';
+    }
     function toggleConsole() {
         if (!consoleContent) return;
-        if (consoleContent.style.display === 'none') {
-            consoleContent.style.display = 'block';
-        } else {
-            consoleContent.style.display = 'none';
-        }
+        consoleVisible = !consoleVisible;
+        consoleContent.style.display = consoleVisible ? 'block' : 'none';
+        updateConsoleButton();
     }
+    
     window.toggleConsole = toggleConsole;
+    // Set initial state based on actual display
+    consoleVisible = (consoleContent && consoleContent.style.display !== 'none');
+    updateConsoleButton();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -111,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsDiv.innerHTML += '<div class="result-card">No similar tickets found.</div>';
         }
         if (classifierResult && classifierResult.prediction) {
-            resultsDiv.innerHTML += `<h3>Classifier Prediction</h3>
+            resultsDiv.innerHTML += `<h3>Classifier Prediction (Random Forest)</h3>
                 <div class="result-card">
                     <b>Predicted Application:</b> <span class="application">${classifierResult.prediction}</span><br>
                     ${classifierResult.probabilities ? `<details><summary>Probabilities</summary><pre>${JSON.stringify(classifierResult.probabilities, null, 2)}</pre></details>` : ''}

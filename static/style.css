@@ -82,40 +82,35 @@ h1 {
     font-weight: 600;
 }
 form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 16px;
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    grid-gap: 10px 16px;
     align-items: flex-start;
     margin-bottom: 14px;
     font-size: 0.95em;
 }
+.form-buttons {
+    grid-column: 2 / 3;
+    display: flex;
+    gap: 10px;
+}
 form label {
-    flex: 0 0 80px;
     color: #2a3b4c;
     font-size: 0.94em;
     align-self: flex-start;
     margin-top: 4px;
+    justify-self: end;
+    padding-right: 0;
 }
-form textarea {
-    flex: 1 1 400px;
-    padding: 6px 9px;
-    border: 1px solid #cfd8dc;
-    border-radius: 5px;
-    font-size: 0.95em;
-    background: #f5f7fa;
-    transition: border 0.2s;
-    min-width: 300px;
-    max-width: 100%;
-}
-.topn-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1 1 0;
+form textarea, form input[type="number"] {
+    width: 100%;
+    box-sizing: border-box;
     min-width: 180px;
 }
-form input[type="number"] {
-    width: 60px;
+.topn-group {
+    display: contents;
+}
+form textarea {
     padding: 6px 9px;
     border: 1px solid #cfd8dc;
     border-radius: 5px;
@@ -128,7 +123,7 @@ form textarea:focus, form input:focus {
     outline: none;
 }
 button {
-    padding: 6px 15px;
+    padding: 6px 0;
     border: none;
     border-radius: 5px;
     background: #1976d2;
@@ -136,6 +131,9 @@ button {
     font-size: 0.95em;
     cursor: pointer;
     transition: background 0.2s;
+    min-width: 120px;
+    width: 120px;
+    text-align: center;
 }
 button:hover {
     background: #125ea7;
