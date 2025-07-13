@@ -11,8 +11,10 @@ import re
 import pandas as pd
 from colorama import Fore, Style, init  # Add at the top
 init(autoreset=True)  # Initialize colorama
+import joblib
 
 # Fields to try for application detection
+DEBUG_MODE = False
 APP_FIELDS = ['Service', 'Service*+', 'Application', 'Classification', 'Group']
 
 def normalize_field_name(name):
@@ -81,6 +83,20 @@ def main():
     logger.info(f"Loading embedding model: {config.embedding_model}")
     embedder = SentenceTransformer(config.embedding_model)
 
+    # Optionally load classifier ensemble
+    clf = None
+    vectorizer = None
+    if getattr(config, 'enable_classifier_ensemble', False):
+        try:
+            clf = joblib.load('models/rf_classifier.pkl')
+            vectorizer = joblib.load('models/vectorizer.pkl')
+            logger.info("Loaded classifier ensemble model and vectorizer.")
+        except Exception as e:
+            print("Warning: Could not load classifier ensemble model. Skipping classifier prediction.")
+            logger.warning(f"Could not load classifier ensemble: {e}")
+            clf = None
+            vectorizer = None
+
     # Load ChromaDB collection
     logger.info(f"Loading ChromaDB vector store from: {config.vector_store_path}")
     client = chromadb.PersistentClient(path=config.vector_store_path)
@@ -125,8 +141,9 @@ def main():
             print("No query entered. Please try again.")
             continue
         # Embed the query
-
+        print(f"\n{Fore.YELLOW}Input Query: {query}{Style.RESET_ALL}\n")
         query_emb = embedder.encode([query], normalize_embeddings=True)[0]
+
         # Compute cosine similarity in batches
         logger.info("Computing cosine similarities...")
         sims = []
@@ -143,20 +160,24 @@ def main():
         unique_results = []
         for rank, idx in enumerate(top_idx, 1):
             meta = metadatas[idx]
-            if rank == 1:
+            if rank == 1 and DEBUG_MODE:
                 print(f"DEBUG META: {meta}")  # Debug print for the top result
+            
             # Robust value extraction
             def safe_val(field):
                 val = meta.get(field, '') if field else ''
                 if pd.isna(val):
                     return ''
                 return val
+
             summary = safe_val(summary_field)
+
             # Ticket ID: show first non-blank from all candidates
             ticketid = safe_val(ticketid_field)
             if not ticketid:
                 ticketid = get_first_nonblank(meta, ticketid_candidates)
             ticketid = dedup_slash(ticketid)
+
             # Application: show first non-blank from all candidates
             app = safe_val(app_field)
             if not app:
@@ -168,14 +189,25 @@ def main():
                 unique_results.append((idx, meta, ticketid, app, summary))
             if len(unique_results) == top_n:
                 break
-        print(f"\n{Fore.YELLOW}Query: {query}{Style.RESET_ALL}")
-                
+
+        # Classifier ensemble prediction
+        if clf is not None and vectorizer is not None:
+            # Use the same feature extraction as in training
+            # (combine fields as in config.fields_to_embed)
+            query_parts = [query]
+            query_text = " ".join(query_parts).lower()
+            X_query = vectorizer.transform([query_text])
+            pred = clf.predict(X_query)[0]
+            proba = max(clf.predict_proba(X_query)[0])
+            print(f"\n{Fore.CYAN}Classifier prediction: {pred}{Style.RESET_ALL} (confidence: {proba:.2f})")
+
         print(f"\nTop {top_n} most similar tickets:")
         app_tally = {}
         for rank, (idx, meta, ticketid, app, summary) in enumerate(unique_results, 1):
             score = sims[idx]
             print(f"{rank}. Ticket ID: {ticketid}\n   Application: {app}\n   Summary: {summary}\n   Similarity: {score:.4f}\n")
             app_tally[app] = app_tally.get(app, 0) + 1
+
         # Determine most likely application
         if app_tally:
             likely_app = max(app_tally.items(), key=lambda x: x[1])[0]

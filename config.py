@@ -43,3 +43,9 @@ fields_to_embed = [
 # Logging level: 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 log_level = 'INFO' 
 
+# Whether to store empty metadata fields (True) or omit them (False)
+store_empty_metadata = True 
+
+# Enable or disable classifier ensemble in query_search.py
+enable_classifier_ensemble = True 
+
