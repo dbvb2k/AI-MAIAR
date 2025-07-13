@@ -1,0 +1,16 @@
+pandas>=1.5.0
+openpyxl>=3.0.0
+sentence-transformers>=2.2.2
+chromadb>=0.4.22
+faiss-cpu>=1.7.4
+tqdm>=4.66.3
+python-dotenv>=1.0.0
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.12.2
+loguru>=0.7.0
+xlrd==1.2.0
+# torch>=2.7.0-GPU  # For GPU/CPU support. For CUDA, install the appropriate version from https://pytorch.org/get-started/locally/ 
+pyarrow>=20.0.0
+dill>=0.4.0
+aiohttp>=3.12.14
+hf_xet>=1.1.5
