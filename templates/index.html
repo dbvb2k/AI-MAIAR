@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI MAIAR</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+    <div class="main-content">
+        <h1>AI-Driven Multi-Application Incident Assignment & Resolution</h1>
+        <form id="search-form" autocomplete="off">
+            <label for="query">Query:</label>
+            <textarea id="query" name="query" required placeholder="Describe your ticket or issue..." rows="5" cols="80" style="resize:vertical;width:100%;min-width:300px;"></textarea>
+            <div class="topn-group">
+                <label for="top_n">Top-N Results:</label>
+                <input type="number" id="top_n" name="top_n" min="1" max="10" value="3">
+            </div>
+            <button type="submit" id="submit-btn">Search</button>
+            <button type="button" id="clear-btn">Clear</button>
+        </form>
+        <div id="loading" class="loading" style="display:none;">Loading...</div>
+        <div id="results" class="results"></div>
+        <div class="collapsible">
+            <button type="button" class="collapsible-btn" onclick="toggleConsole()">Show Console</button>
+            <div class="console-content" id="console-content" style="display:none;"></div>
+        </div>
+    </div>
+    <div class="status-panel">
+        <div class="status-heading-row" style="display:flex;align-items:center;gap:8px;justify-content:flex-start;">
+            <div class="status-heading">Status:</div>
+            <div id="status-message"></div>
+        </div>
+        <div class="health-status" id="health-status">
+            <div class="status-label"><span id="status-embedder" class="status-dot unknown"></span> Embedding Model</div>
+            <div class="status-label"><span id="status-vector" class="status-dot unknown"></span> Vector Store</div>
+            <div class="status-label"><span id="status-classifier" class="status-dot unknown"></span> Classifier</div>
+        </div>
+    </div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html> 

@@ -1,0 +1,233 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f9fa;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+.container {
+    max-width: 900px;
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 28px 24px 20px 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+}
+.main-content {
+    flex: 2 1 0;
+}
+.status-panel {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 8px;
+}
+.status-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    width: 100%;
+}
+.status-heading {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #2a3b4c;
+    margin-bottom: 4px;
+    margin-top: 0;
+    text-align: left;
+}
+.health-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 0.95em;
+    margin-bottom: 0;
+}
+.status-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+}
+.status-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+    border: 1px solid #bbb;
+}
+.status-dot.unknown { background: #bbb; }
+.status-dot.ok { background: #4caf50; }
+.status-dot.warn { background: #ffc107; }
+.status-dot.err { background: #e53935; }
+#status-message {
+    font-size: 0.92em;
+    color: #607d8b;
+    margin-top: 0;
+    text-align: left;
+}
+h1 {
+    text-align: left;
+    color: #2a3b4c;
+    margin-bottom: 18px;
+    font-size: 1.15em;
+    font-weight: 600;
+}
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    font-size: 0.95em;
+}
+form label {
+    flex: 0 0 80px;
+    color: #2a3b4c;
+    font-size: 0.94em;
+    align-self: flex-start;
+    margin-top: 4px;
+}
+form textarea {
+    flex: 1 1 400px;
+    padding: 6px 9px;
+    border: 1px solid #cfd8dc;
+    border-radius: 5px;
+    font-size: 0.95em;
+    background: #f5f7fa;
+    transition: border 0.2s;
+    min-width: 300px;
+    max-width: 100%;
+}
+.topn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 0;
+    min-width: 180px;
+}
+form input[type="number"] {
+    width: 60px;
+    padding: 6px 9px;
+    border: 1px solid #cfd8dc;
+    border-radius: 5px;
+    font-size: 0.95em;
+    background: #f5f7fa;
+    transition: border 0.2s;
+}
+form textarea:focus, form input:focus {
+    border: 1.5px solid #1976d2;
+    outline: none;
+}
+button {
+    padding: 6px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #1976d2;
+    color: #fff;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #125ea7;
+}
+button#clear-btn {
+    background: #b0bec5;
+    color: #263238;
+}
+button#clear-btn:hover {
+    background: #78909c;
+}
+.loading {
+    text-align: left;
+    color: #1976d2;
+    font-weight: 500;
+    margin: 10px 0;
+    font-size: 0.95em;
+}
+.results {
+    margin-top: 12px;
+    font-size: 0.94em;
+}
+.result-card {
+    background: #f1f8e9;
+    border-left: 4px solid #1976d2;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.result-card .meta {
+    font-size: 0.93em;
+    color: #607d8b;
+    margin-bottom: 2px;
+}
+.result-card .score {
+    float: right;
+    color: #388e3c;
+    font-weight: 600;
+    font-size: 0.94em;
+}
+.result-card .summary {
+    font-size: 0.97em;
+    color: #263238;
+    margin-bottom: 4px;
+}
+.result-card .application {
+    font-weight: 500;
+    color: #1976d2;
+    text-align: left;
+    display: block;
+}
+h3 {
+    text-align: left;
+    font-size: 0.98em;
+    font-weight: 600;
+    margin: 18px 0 8px 0;
+    color: #2a3b4c;
+}
+.collapsible {
+    margin-top: 18px;
+}
+.collapsible-btn {
+    background: #e3eafc;
+    color: #1976d2;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 12px;
+    font-size: 0.94em;
+    cursor: pointer;
+    margin-bottom: 4px;
+}
+.console-content {
+    background: #212121;
+    color: #e0e0e0;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    font-size: 0.93em;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 2px;
+    max-height: 140px;
+    overflow-y: auto;
+    display: block;
+}
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 2px;
+    }
+    .status-panel {
+        align-items: flex-start;
+        margin-top: 18px;
+    }
+} 
