@@ -12,8 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBtn = document.getElementById('clear-btn');
     const consoleContent = document.getElementById('console-content');
     const consoleBtn = document.querySelector('.collapsible-btn');
+    const llmSection = document.getElementById('llm-section');
+    const llmBtn = document.getElementById('llm-btn');
+    const llmExplanationDiv = document.getElementById('llm-explanation');
     let lastHealth = null;
     let consoleVisible = false;
+    let lastQuery = '';
+    let lastClassifierPrediction = '';
+    let lastVectorResults = [];
+    let llmApiUrl = 'http://localhost:8080/llm_explanation'; // default, will be overwritten
 
     async function checkHealth() {
         try {
@@ -60,10 +67,51 @@ document.addEventListener('DOMContentLoaded', () => {
     consoleVisible = (consoleContent && consoleContent.style.display !== 'none');
     updateConsoleButton();
 
+    async function fetchFrontendConfig() {
+        try {
+            const resp = await fetch('/frontend_config');
+            if (!resp.ok) throw new Error('Config fetch failed');
+            const data = await resp.json();
+            if (data.llm_api_url) llmApiUrl = data.llm_api_url;
+            logConsole('Loaded frontend config: ' + JSON.stringify(data));
+        } catch (e) {
+            logConsole('Failed to load frontend config, using default LLM API URL.');
+        }
+    }
+
+    async function fetchLLMExplanation() {
+        llmExplanationDiv.innerHTML = '<div class="loading">Getting LLM explanation...</div>';
+        llmBtn.disabled = true;
+        try {
+            const resp = await fetch(llmApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: lastQuery,
+                    classifier_prediction: lastClassifierPrediction,
+                    top_n_results: lastVectorResults
+                })
+            });
+            if (!resp.ok) throw new Error('LLM API error');
+            const data = await resp.json();
+            llmExplanationDiv.innerHTML = `<div class="result-card"><b>LLM Explanation:</b><br>${data.explanation}</div>`;
+            logConsole('LLM explanation: ' + data.explanation);
+        } catch (e) {
+            llmExplanationDiv.innerHTML = `<div class="result-card">LLM error: ${e}</div>`;
+            logConsole('LLM error: ' + e);
+        }
+        llmBtn.disabled = false;
+    }
+    if (llmBtn) {
+        llmBtn.addEventListener('click', fetchLLMExplanation);
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         resultsDiv.innerHTML = '';
         loadingDiv.style.display = 'block';
+        llmSection.style.display = 'none';
+        llmExplanationDiv.innerHTML = '';
         const query = queryInput.value.trim();
         const top_n = parseInt(topNInput.value) || 3;
         if (!query) {
@@ -72,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         logConsole('Submitting query: ' + query);
+        lastQuery = query;
         // Vector search
         let vectorResults = [];
         let classifierResult = null;
@@ -139,6 +188,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <b>Predicted Application:</b> <span class="application">${classifierResult.prediction}</span><br>
                     ${classifierResult.probabilities ? `<details><summary>Probabilities</summary><pre>${JSON.stringify(classifierResult.probabilities, null, 2)}</pre></details>` : ''}
                 </div>`;
+            // Show LLM section and enable button
+            llmSection.style.display = '';
+            llmBtn.disabled = false;
+            lastClassifierPrediction = classifierResult.prediction;
+            lastVectorResults = vectorResults;
+            llmExplanationDiv.innerHTML = '';
+        } else {
+            llmSection.style.display = 'none';
+            llmExplanationDiv.innerHTML = '';
         }
     });
     clearBtn.addEventListener('click', (e) => {
@@ -146,8 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
         queryInput.value = '';
         resultsDiv.innerHTML = '';
         loadingDiv.style.display = 'none';
+        llmSection.style.display = 'none';
+        llmExplanationDiv.innerHTML = '';
         logConsole('Cleared form/results');
     });
     // Initial health check
     checkHealth();
+    fetchFrontendConfig();
 }); 

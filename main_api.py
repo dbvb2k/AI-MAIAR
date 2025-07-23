@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
+from fastapi.responses import JSONResponse
 
 # --- Pydantic Schemas ---
 class VectorSearchRequest(BaseModel):
@@ -58,6 +59,17 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/frontend_config")
+def frontend_config():
+    llm_url = getattr(config, 'llm_api_url', 'http://localhost:8080/llm_explanation')
+    if not llm_url.rstrip('/').endswith('/llm_explanation'):
+        llm_url = llm_url.rstrip('/') + '/llm_explanation'
+
+    # print(f"LLM URL: {llm_url}")
+    return JSONResponse({
+        "llm_api_url": llm_url
+    })
 
 # --- Global Objects ---
 EMBEDDER = None

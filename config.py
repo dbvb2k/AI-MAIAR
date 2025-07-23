@@ -55,3 +55,4 @@ llm_endpoint = 'http://localhost:11434/api/generate'  # Ollama default endpoint
 llm_api_key = ''  # For OpenAI, Together, etc. (not used for local Ollama)
 llm_tone = 'concise'  # Options: 'concise', 'technical', 'user-friendly'
 
+llm_api_url = 'http://localhost:8080/llm_explanation' # Our LLM API URL
