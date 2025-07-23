@@ -49,3 +49,9 @@ store_empty_metadata = True
 # Enable or disable classifier ensemble in query_search.py
 enable_classifier_ensemble = True 
 
+# LLM configuration
+llm_provider = 'ollama'  # Options: 'ollama', 'openai', 'together', etc.
+llm_endpoint = 'http://localhost:11434/api/generate'  # Ollama default endpoint
+llm_api_key = ''  # For OpenAI, Together, etc. (not used for local Ollama)
+llm_tone = 'concise'  # Options: 'concise', 'technical', 'user-friendly'
+

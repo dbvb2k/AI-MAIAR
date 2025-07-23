@@ -107,11 +107,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vectorResults && vectorResults.length > 0) {
             resultsDiv.innerHTML += `<h3>Top ${vectorResults.length} Similar Tickets</h3>`;
             vectorResults.forEach((r, i) => {
+                // Consistent metadata field order
+                const metaOrder = [
+                    'TicketID', 'Application', 'Summary', 'Description', 'Title', 'SLM', 'Classification', 'Resolution Comments', 'file', 'row'
+                ];
+                // Deduplicate slash-separated values for TicketID and Application
+                function dedupSlash(val) {
+                    const parts = (val || '').split('/').filter(Boolean);
+                    return [...new Set(parts)].join('/');
+                }
+                let metaTable = '<table class="meta-table">';
+                metaOrder.forEach(field => {
+                    let value = r.meta[field] !== undefined ? r.meta[field] : '';
+                    if (field === 'TicketID' || field === 'Application') value = dedupSlash(value);
+                    metaTable += `<tr><td><b>${field}</b></td><td>${value}</td></tr>`;
+                });
+                metaTable += '</table>';
                 resultsDiv.innerHTML += `
                 <div class="result-card">
                     <div class="meta">#${i+1} | Ticket ID: <b>${r.ticketid || '-'}</b> | App: <span class="application">${r.application || '-'}</span> <span class="score">${r.similarity.toFixed(3)}</span></div>
                     <div class="summary">${r.summary || '<i>No summary</i>'}</div>
-                    <details><summary>Metadata</summary><pre>${JSON.stringify(r.meta, null, 2)}</pre></details>
+                    <details><summary>Metadata</summary>${metaTable}</details>
                 </div>`;
             });
         } else {
