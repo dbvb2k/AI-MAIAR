@@ -25,7 +25,16 @@
         <div id="loading" class="loading" style="display:none;">Loading...</div>
         <div id="results" class="results"></div>
         <div id="llm-section" style="display:none;">
-            <button type="button" id="llm-btn">Explain with LLM</button>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div id="llm-tone-group" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 500; margin-right: 4px;">Select Tone:</span>
+                    <label><input type="radio" name="llm-tone" value="concise" checked> Concise</label>
+                    <label><input type="radio" name="llm-tone" value="technical"> Technical</label>
+                    <label><input type="radio" name="llm-tone" value="user-friendly"> User-friendly</label>
+                </div>
+                <button type="button" id="llm-btn">Explain with LLM</button>
+            </div>
+            <div id="llm-spinner" class="spinner" style="display:none;margin:12px 0;"></div>
             <div id="llm-explanation" class="llm-explanation"></div>
         </div>
         <div class="collapsible">

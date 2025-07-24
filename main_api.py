@@ -15,6 +15,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import requests
+from contextlib import asynccontextmanager
 
 # --- Pydantic Schemas ---
 class VectorSearchRequest(BaseModel):
@@ -43,7 +44,60 @@ class HealthResponse(BaseModel):
     message: str
 
 # --- FastAPI App ---
-app = FastAPI(title="ITSM Ticket Search API")
+def load_models():
+    global EMBEDDER, CHROMA_CLIENT, COLLECTION, EMBEDDINGS, METADATAS, CLF, VECTORIZER
+    
+    # Setup logging
+    utils.setup_logging()
+    logger.info("Starting AI MAIAR application...")
+    
+    try:
+        logger.info("Loading embedding model...")
+        EMBEDDER = utils.load_embedding_model()
+    except Exception as e:
+        utils.log_error(e, "Failed to load embedding model")
+        EMBEDDER = None
+    
+    try:
+        logger.info(f"Connecting to ChromaDB at {config.vector_store_path}...")
+        start_time = time.time()
+        CHROMA_CLIENT = chromadb.PersistentClient(path=config.vector_store_path)
+        COLLECTION = CHROMA_CLIENT.get_or_create_collection("itsm_tickets")
+        duration = time.time() - start_time
+        utils.log_performance("ChromaDB Connection", duration)
+        
+        if COLLECTION.count() > 0:
+            EMBEDDINGS, METADATAS = utils.load_chroma_embeddings(COLLECTION, batch_size=config.chroma_batch_size)
+        else:
+            logger.warning("ChromaDB collection is empty")
+            EMBEDDINGS, METADATAS = None, None
+    except Exception as e:
+        utils.log_error(e, "Failed to load ChromaDB vector store")
+        COLLECTION = None
+        EMBEDDINGS, METADATAS = None, None
+    
+    # Only load classifier if enabled in config
+    if getattr(config, 'enable_classifier_ensemble', False):
+        try:
+            CLF, VECTORIZER = utils.load_classifier_and_vectorizer()
+        except Exception as e:
+            utils.log_error(e, "Failed to load classifier/vectorizer")
+            CLF, VECTORIZER = None, None
+    else:
+        logger.info("Classifier ensemble disabled in config")
+        CLF, VECTORIZER = None, None
+    
+    # Check LLM API health on startup
+    check_llm_api_health()
+
+    logger.info("Application startup completed")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_models()
+    yield
+
+app = FastAPI(title="ITSM Ticket Search API", lifespan=lifespan)
 
 # Allow CORS for local frontend
 app.add_middleware(
@@ -110,56 +164,6 @@ def check_llm_api_health():
         LLM_API_STATUS = False
     LLM_API_LAST_CHECK = now
     return LLM_API_STATUS
-
-# --- Startup Event ---
-@app.on_event("startup")
-def load_models():
-    global EMBEDDER, CHROMA_CLIENT, COLLECTION, EMBEDDINGS, METADATAS, CLF, VECTORIZER
-    
-    # Setup logging
-    utils.setup_logging()
-    logger.info("Starting AI MAIAR application...")
-    
-    try:
-        logger.info("Loading embedding model...")
-        EMBEDDER = utils.load_embedding_model()
-    except Exception as e:
-        utils.log_error(e, "Failed to load embedding model")
-        EMBEDDER = None
-    
-    try:
-        logger.info(f"Connecting to ChromaDB at {config.vector_store_path}...")
-        start_time = time.time()
-        CHROMA_CLIENT = chromadb.PersistentClient(path=config.vector_store_path)
-        COLLECTION = CHROMA_CLIENT.get_or_create_collection("itsm_tickets")
-        duration = time.time() - start_time
-        utils.log_performance("ChromaDB Connection", duration)
-        
-        if COLLECTION.count() > 0:
-            EMBEDDINGS, METADATAS = utils.load_chroma_embeddings(COLLECTION, batch_size=config.chroma_batch_size)
-        else:
-            logger.warning("ChromaDB collection is empty")
-            EMBEDDINGS, METADATAS = None, None
-    except Exception as e:
-        utils.log_error(e, "Failed to load ChromaDB vector store")
-        COLLECTION = None
-        EMBEDDINGS, METADATAS = None, None
-    
-    # Only load classifier if enabled in config
-    if getattr(config, 'enable_classifier_ensemble', False):
-        try:
-            CLF, VECTORIZER = utils.load_classifier_and_vectorizer()
-        except Exception as e:
-            utils.log_error(e, "Failed to load classifier/vectorizer")
-            CLF, VECTORIZER = None, None
-    else:
-        logger.info("Classifier ensemble disabled in config")
-        CLF, VECTORIZER = None, None
-    
-    # Check LLM API health on startup
-    check_llm_api_health()
-
-    logger.info("Application startup completed")
 
 # --- Health Endpoint ---
 @app.get("/health", response_model=HealthResponse)

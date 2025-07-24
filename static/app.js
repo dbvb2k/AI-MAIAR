@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const llmBtn = document.getElementById('llm-btn');
     const llmExplanationDiv = document.getElementById('llm-explanation');
     const statusLLM = document.getElementById('status-llm');
+    const llmSpinner = document.getElementById('llm-spinner');
     let lastHealth = null;
     let consoleVisible = false;
     let lastQuery = '';
@@ -104,26 +105,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const startTime = Date.now();
         logConsole('Requesting LLM explanation...', 'DEBUG');
         logConsole(`LLM Request - Query: ${lastQuery} | Prediction: ${lastClassifierPrediction}`, 'DEBUG');
-        
-        llmExplanationDiv.innerHTML = '<div class="loading">Getting LLM explanation...</div>';
+        llmExplanationDiv.innerHTML = '';
+        llmSpinner.style.display = 'block';
         llmBtn.disabled = true;
         try {
+            // Get selected tone
+            let tone = undefined;
+            const toneRadios = document.getElementsByName('llm-tone');
+            for (const radio of toneRadios) {
+                if (radio.checked) {
+                    tone = radio.value;
+                    break;
+                }
+            }
             const requestData = {
                 query: lastQuery,
                 classifier_prediction: lastClassifierPrediction,
                 top_n_results: lastVectorResults
             };
-            
+            if (tone) requestData.tone = tone;
             const resp = await fetch(llmApiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
             });
-            
             if (!resp.ok) throw new Error('LLM API error');
             const data = await resp.json();
             const duration = Date.now() - startTime;
-            
             llmExplanationDiv.innerHTML = `<div class="result-card"><b>LLM Explanation:</b><br>${data.explanation}</div>`;
             logConsole(`LLM explanation received in ${duration}ms (${data.explanation.length} chars)`, 'INFO');
             logConsole(`LLM explanation: ${data.explanation}`, 'DEBUG');
@@ -132,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             llmExplanationDiv.innerHTML = `<div class="result-card">LLM error: ${e}</div>`;
             logConsole(`LLM error after ${duration}ms: ${e}`, 'ERROR');
         }
+        llmSpinner.style.display = 'none';
         llmBtn.disabled = false;
     }
     if (llmBtn) {

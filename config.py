@@ -1,3 +1,10 @@
+from enum import Enum
+
+class LLMTone(str, Enum):
+    CONCISE = 'concise'
+    TECHNICAL = 'technical'
+    USER_FRIENDLY = 'user-friendly'
+
 # Configuration for ITSM Embedding Pipeline
 # This file is used to configure the AI MAIAR application.
 # It is used to configure the data folder, log folder, file list, vector store type, vector store path, embedding model, chroma batch size, batch size for embedding, fields to embed, logging level, whether to store empty metadata fields, whether to enable classifier ensemble, and LLM configuration. 
@@ -56,10 +63,13 @@ enable_classifier_ensemble = True
 llm_provider = 'ollama'  # Options: 'ollama', 'openai', 'together', etc.
 llm_endpoint = 'http://localhost:11434/api/generate'  # Ollama default endpoint
 llm_api_key = ''  # For OpenAI, Together, etc. (not used for local Ollama)
-llm_tone = 'concise'  # Options: 'concise', 'technical', 'user-friendly'
+llm_tone = LLMTone.CONCISE  # Default tone. Options: LLMTone.CONCISE, LLMTone.TECHNICAL, LLMTone.USER_FRIENDLY
 
 # LLM API Related
 llm_api_url = 'http://localhost:8080/llm_explanation' # Our LLM API URL
+
+# LLM Model name
+llm_model_name = 'llama3:8b'
 
 # LLM health check config
 llm_health_check_interval = 30  # seconds

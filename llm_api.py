@@ -9,8 +9,15 @@ import httpx
 from loguru import logger
 from fastapi.middleware.cors import CORSMiddleware
 import utils
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="LLM Explanation API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    utils.setup_logging()
+    logger.info("LLM API starting up...")
+    yield
+
+app = FastAPI(title="LLM Explanation API", lifespan=lifespan)
 
 # Add CORS middleware for local frontend use
 app.add_middleware(
@@ -22,10 +29,10 @@ app.add_middleware(
 )
 
 # Setup logging on startup
-@app.on_event("startup")
-def startup_event():
-    utils.setup_logging()
-    logger.info("LLM API starting up...")
+# @app.on_event("startup")
+# def startup_event():
+#     utils.setup_logging()
+#     logger.info("LLM API starting up...")
 
 class LLMExplanationRequest(BaseModel):
     query: str
@@ -39,7 +46,7 @@ class LLMExplanationResponse(BaseModel):
 # Helper: Build prompt for LLM
 def build_prompt(query, classifier_prediction, top_n_results, tone):
     prompt = f"""
-You are an expert ITSM assistant. Given the following user query, classifier prediction, and top-N similar tickets, explain in {tone or config.llm_tone} language why the predicted application is the most relevant.
+You are an expert ITSM assistant. Given the following user query, classifier prediction, and top-N similar tickets, explain in {tone or config.llm_tone.value} language why the predicted application is the most relevant.
 
 User Query:
 {query}
@@ -69,7 +76,7 @@ async def call_llm(prompt):
     if provider == 'ollama':
         # Ollama API expects {model, prompt, stream: false}
         payload = {
-            "model": "llama3:8b",
+            "model": config.llm_model_name,
             "prompt": prompt,
             "stream": False
         }
