@@ -129,3 +129,20 @@ async def llm_explanation(req: LLMExplanationRequest):
         utils.log_error(e, "LLM explanation endpoint", include_traceback=True)
         utils.log_api_response("/llm_explanation", "POST", {"error": str(e)}, 500, start_time)
         raise HTTPException(status_code=500, detail=f"LLM explanation failed: {str(e)}") 
+
+@app.get("/llm_health")
+def llm_health():
+    """Health check for LLM API: checks if Ollama is reachable and responsive."""
+    import requests
+    provider = getattr(config, 'llm_provider', 'ollama')
+    # Use /api/tags for GET
+    # endpoint = 'http://localhost:11434/api/tags'
+    endpoint = getattr(config, 'llm_health_check_endpoint', 'http://localhost:11434/api/tags')
+    if provider != 'ollama':
+        return {"ok": False, "error": "Only Ollama health check implemented"}
+    try:
+        resp = requests.get(endpoint, timeout=3)
+        resp.raise_for_status()
+        return {"ok": True}
+    except Exception as e:
+        return {"ok": False, "error": str(e)} 

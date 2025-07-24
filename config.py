@@ -60,3 +60,8 @@ llm_tone = 'concise'  # Options: 'concise', 'technical', 'user-friendly'
 
 # LLM API Related
 llm_api_url = 'http://localhost:8080/llm_explanation' # Our LLM API URL
+
+# LLM health check config
+llm_health_check_interval = 30  # seconds
+llm_health_check_timeout = 3    # seconds
+llm_health_check_endpoint = 'http://localhost:11434/api/tags'  # Ollama default health check endpoint

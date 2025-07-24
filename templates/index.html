@@ -38,10 +38,11 @@
             <div class="status-heading">Status:</div>
             <div id="status-message"></div>
         </div>
-        <div class="health-status" id="health-status">
-            <div class="status-label"><span id="status-embedder" class="status-dot unknown"></span> Embedding Model</div>
-            <div class="status-label"><span id="status-vector" class="status-dot unknown"></span> Vector Store</div>
-            <div class="status-label"><span id="status-classifier" class="status-dot unknown"></span> Classifier</div>
+        <div id="health-status" class="status-panel">
+            <span class="status-item"><span class="status-dot" id="status-embedder"></span> Embedder</span>
+            <span class="status-item"><span class="status-dot" id="status-vector"></span> Vector Store</span>
+            <span class="status-item"><span class="status-dot" id="status-classifier"></span> Classifier</span>
+            <span class="status-item"><span class="status-dot" id="status-llm"></span> LLM API</span>
         </div>
     </div>
 </div>

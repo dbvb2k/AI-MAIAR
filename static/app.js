@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const llmSection = document.getElementById('llm-section');
     const llmBtn = document.getElementById('llm-btn');
     const llmExplanationDiv = document.getElementById('llm-explanation');
+    const statusLLM = document.getElementById('status-llm');
     let lastHealth = null;
     let consoleVisible = false;
     let lastQuery = '';
@@ -33,15 +34,26 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatusDot(statusEmbedder, data.embedding_model);
             setStatusDot(statusVector, data.vector_store);
             setStatusDot(statusClassifier, data.classifier);
+            setStatusDot(statusLLM, data.llm_api);
             statusMessage.textContent = data.message;
             logConsole(`Health check completed in ${duration}ms: ${JSON.stringify(data)}`, 'INFO');
+            // Disable LLM button/section if LLM API is unavailable
+            if (!data.llm_api) {
+                llmSection.style.display = 'none';
+                llmBtn.disabled = true;
+                llmExplanationDiv.innerHTML = '<div class="result-card">LLM API unavailable.</div>';
+            }
         } catch (e) {
             const duration = Date.now() - startTime;
             setStatusDot(statusEmbedder, false);
             setStatusDot(statusVector, false);
             setStatusDot(statusClassifier, false);
+            setStatusDot(statusLLM, false);
             statusMessage.textContent = 'API unreachable';
             logConsole(`Health check failed after ${duration}ms: ${e}`, 'ERROR');
+            llmSection.style.display = 'none';
+            llmBtn.disabled = true;
+            llmExplanationDiv.innerHTML = '<div class="result-card">LLM API unavailable.</div>';
         }
     }
     function setStatusDot(dot, ok) {

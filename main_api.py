@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from fastapi.responses import JSONResponse
+import requests
 
 # --- Pydantic Schemas ---
 class VectorSearchRequest(BaseModel):
@@ -38,6 +39,7 @@ class HealthResponse(BaseModel):
     embedding_model: bool
     vector_store: bool
     classifier: bool
+    llm_api: bool
     message: str
 
 # --- FastAPI App ---
@@ -82,6 +84,32 @@ EMBEDDINGS = None
 METADATAS = None
 CLF = None
 VECTORIZER = None
+LLM_API_STATUS = None
+LLM_API_LAST_CHECK = 0
+
+def check_llm_api_health():
+    global LLM_API_STATUS, LLM_API_LAST_CHECK
+    now = time.time()
+    interval = getattr(config, 'llm_health_check_interval', 30)
+    timeout = getattr(config, 'llm_health_check_timeout', 3)
+    llm_api_url = getattr(config, 'llm_api_url', 'http://localhost:8080/llm_explanation')
+    from urllib.parse import urlparse, urlunparse
+    parsed = urlparse(llm_api_url)
+    base = urlunparse((parsed.scheme, parsed.netloc, '', '', '', ''))
+    llm_url = f"{base}/llm_health"
+    if LLM_API_STATUS is not None and now - LLM_API_LAST_CHECK < interval:
+        return LLM_API_STATUS
+    try:
+        resp = requests.get(llm_url, timeout=timeout)
+        data = resp.json()
+        ok = data.get('ok', False)
+        if isinstance(ok, str):
+            ok = ok.lower() == 'true'
+        LLM_API_STATUS = bool(ok)
+    except Exception as e:
+        LLM_API_STATUS = False
+    LLM_API_LAST_CHECK = now
+    return LLM_API_STATUS
 
 # --- Startup Event ---
 @app.on_event("startup")
@@ -128,6 +156,9 @@ def load_models():
         logger.info("Classifier ensemble disabled in config")
         CLF, VECTORIZER = None, None
     
+    # Check LLM API health on startup
+    check_llm_api_health()
+
     logger.info("Application startup completed")
 
 # --- Health Endpoint ---
@@ -135,11 +166,12 @@ def load_models():
 def health():
     start_time = time.time()
     utils.log_api_request("/health", "GET", {}, start_time)
-    
+    llm_api_ok = check_llm_api_health()
     status = HealthResponse(
         embedding_model=EMBEDDER is not None,
         vector_store=COLLECTION is not None and EMBEDDINGS is not None,
         classifier=(CLF is not None and VECTORIZER is not None) if getattr(config, 'enable_classifier_ensemble', False) else False,
+        llm_api=llm_api_ok,
         message="OK"
     )
     
@@ -151,6 +183,8 @@ def health():
         status.message = "Classifier not loaded"
     elif not getattr(config, 'enable_classifier_ensemble', False):
         status.message = "Classifier ensemble disabled in config"
+    elif not status.llm_api:
+        status.message = "LLM API not available"
     
     utils.log_api_response("/health", "GET", status.dict(), 200, start_time)
     return status
