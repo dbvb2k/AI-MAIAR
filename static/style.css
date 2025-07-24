@@ -15,9 +15,12 @@ body {
     display: flex;
     flex-direction: row;
     gap: 32px;
+    overflow: hidden;
 }
 .main-content {
     flex: 2 1 0;
+    min-width: 0;
+    overflow: hidden;
 }
 .status-panel {
     flex: 0 0 200px;
@@ -195,6 +198,8 @@ h3 {
 }
 .collapsible {
     margin-top: 18px;
+    width: 100%;
+    overflow: hidden;
 }
 .collapsible-btn {
     background: #e3eafc;
@@ -216,7 +221,34 @@ h3 {
     margin-top: 2px;
     max-height: 140px;
     overflow-y: auto;
+    overflow-x: hidden;
     display: block;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* LLM Section Styles */
+#llm-section {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+#llm-btn {
+    margin-bottom: 12px;
+}
+
+.llm-explanation {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 8px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 @media (max-width: 900px) {
     .container {

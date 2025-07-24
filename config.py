@@ -1,10 +1,16 @@
 # Configuration for ITSM Embedding Pipeline
+# This file is used to configure the AI MAIAR application.
+# It is used to configure the data folder, log folder, file list, vector store type, vector store path, embedding model, chroma batch size, batch size for embedding, fields to embed, logging level, whether to store empty metadata fields, whether to enable classifier ensemble, and LLM configuration. 
+
 
 # Path to the folder containing the Excel files
 data_folder = 'data'
 
 # Path to the log folder
 log_folder = 'logs'
+
+# Logging level: 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+log_level = 'INFO' 
 
 # List of Excel filenames to process (relative to data_folder)
 file_list = [
@@ -40,9 +46,6 @@ fields_to_embed = [
     'Summary',
 ]
 
-# Logging level: 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
-log_level = 'INFO' 
-
 # Whether to store empty metadata fields (True) or omit them (False)
 store_empty_metadata = True 
 
@@ -55,4 +58,5 @@ llm_endpoint = 'http://localhost:11434/api/generate'  # Ollama default endpoint
 llm_api_key = ''  # For OpenAI, Together, etc. (not used for local Ollama)
 llm_tone = 'concise'  # Options: 'concise', 'technical', 'user-friendly'
 
+# LLM API Related
 llm_api_url = 'http://localhost:8080/llm_explanation' # Our LLM API URL
