@@ -16,8 +16,9 @@ A sophisticated AI-powered system for intelligent incident ticket classification
 
 - Python 3.8+
 - Ollama (for local LLM inference)
-- Sufficient RAM for embedding models (recommended: 8GB+)
+- Sufficient RAM for embedding models (recommended: 32GB+)
 - Disk space for vector store and models
+- GPU for faster inference
 
 ## 🛠️ Installation
 

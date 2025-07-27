@@ -23,30 +23,33 @@ body {
     overflow: hidden;
 }
 .status-panel {
-    flex: 0 0 200px;
+    flex: 0 0 140px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-top: 8px;
-    background: #f6f8fa;
-    border-radius: 10px;
-    padding: 16px 18px 12px 18px;
-    margin-top: 18px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    max-width: 260px;
+    margin-top: 6px;
+    background: #f6f9fa;
+    border-radius: 6px;
+    padding: 6px 8px 4px 8px;
+    margin-top: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    max-width: 180px;
+    height: 120px;
+    overflow: hidden;
+    align-self: flex-start;
 }
 .status-heading-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     justify-content: flex-start;
     width: 100%;
 }
 .status-heading {
-    font-size: 1rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: #333;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     margin-top: 0;
     text-align: left;
 }
@@ -54,23 +57,23 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
-    font-size: 0.95em;
+    gap: 2px;
+    font-size: 0.67em;
     margin-bottom: 0;
 }
 #health-status {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 2px;
 }
 .status-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
-  font-size: 1rem;
-  margin-bottom: 2px;
+  gap: 3px;
+  font-size: 0.7rem;
+  margin-bottom: 1px;
   font-weight: 400;
   color: #222;
 }
@@ -82,10 +85,10 @@ body {
 }
 .status-dot {
     display: inline-block;
-    width: 13px;
-    height: 13px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    margin-right: 4px;
+    margin-right: 2px;
     vertical-align: middle;
     border: 1px solid #bbb;
 }
@@ -94,7 +97,7 @@ body {
 .status-dot.warn { background: #ffc107; }
 .status-dot.err { background: #e53935; }
 #status-message {
-    font-size: 0.92em;
+    font-size: 0.85em;
     color: #607d8b;
     margin-top: 0;
     text-align: left;
@@ -131,6 +134,7 @@ form textarea, form input[type="number"] {
     width: 100%;
     box-sizing: border-box;
     min-width: 180px;
+    font-size: 0.9em; /* Would make it 10.8px */
 }
 .topn-group {
     display: contents;
